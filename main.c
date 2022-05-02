@@ -6,8 +6,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-const int SCREEN_WIDTH = 640;
-const int SCREEN_HEIGHT = 480;
+const int SCREEN_WIDTH = 800;
+const int SCREEN_HEIGHT = 600;
 
 const char * read_txt_file(const char *filename)
 {
@@ -237,6 +237,10 @@ int main( int argc, char* args[] )
         xloc = ((GLfloat) height) / width;
         yloc = 1.0;
     }
+
+    xloc = 1.0f;
+    yloc = 1.0f;
+
     GLfloat vertexData[] = {-xloc, -yloc, xloc, -yloc,
                             xloc, yloc, -xloc, yloc};
     GLfloat uvData[] = {0.0f, 0.0f, 1.0f, 0.0f,
@@ -271,6 +275,8 @@ int main( int argc, char* args[] )
         return 0;
     }
 
+    GLint resID = glGetUniformLocation(programID, "iresolution");
+    GLint sph_xyID = glGetUniformLocation(programID, "sph_xy");
 
     /*
 	SDL_Surface* screenSurface = NULL;
@@ -283,6 +289,9 @@ int main( int argc, char* args[] )
     */
 
     int quit = 0;
+    float sph_x = 0.0f;
+    float sph_y = 5.0f;
+    float sph_step = 0.5f;
 
     //Enter event loop
     while(!quit)
@@ -304,6 +313,18 @@ int main( int argc, char* args[] )
                     case SDLK_q:
                         quit = 1;
                         break;
+                    case SDLK_LEFT:
+                        sph_x -= sph_step;
+                        break;
+                    case SDLK_RIGHT:
+                        sph_x += sph_step;
+                        break;
+                    case SDLK_DOWN:
+                        sph_y -= sph_step;
+                        break;
+                    case SDLK_UP:
+                        sph_y += sph_step;
+                        break;
                 }
             }
 
@@ -319,6 +340,10 @@ int main( int argc, char* args[] )
             glBindBuffer(GL_ARRAY_BUFFER, uvBuffer);
             glVertexAttribPointer(vertexUVLocation, 2, GL_FLOAT,
                                   GL_FALSE, 0, NULL);
+
+            SDL_GetWindowSize(window, &width, &height);
+            glUniform2i(resID, width, height);
+            glUniform2f(sph_xyID, sph_x, sph_y);
 
             glDrawArrays(GL_TRIANGLE_FAN, 0, 4);
 
